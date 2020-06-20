@@ -9,8 +9,9 @@ import android.widget.ImageView
 import androidx.core.content.res.TypedArrayUtils.getText
 import com.jzsql.lib.mmySql.Sql_Result
 import com.orange.jzchi.jzframework.JzActivity
-import java.io.File
+import java.io.*
 import java.lang.Exception
+import kotlin.collections.ArrayList
 
 //取得父類別中的所有子View
 fun View.listView(): List<View> {
@@ -111,5 +112,30 @@ fun String.storeFile(name: String): Boolean {
     } catch (e: Exception) {
         e.printStackTrace()
         return false
+    }
+}
+//儲存序列化物件
+fun Any.storeObject(name:String):Boolean{
+    try {
+        val out = ByteArrayOutputStream()
+        val oos = ObjectOutputStream(out)
+        oos.writeObject(this);
+        sqlClass.getControlInstance()
+            .item_File.exsql("insert or replace into file (name,data) values ('$name','${out.toByteArray().toHex()}')")
+        return true
+    }catch (e:Exception){
+        e.printStackTrace()
+        return false
+    }
+}
+//取得序列化物件
+fun String.getObject():Any?{
+    try {
+        val out = ByteArrayInputStream(this.getFile())
+        val oos = ObjectInputStream(out)
+        return oos.readObject()
+    }catch (e:Exception){
+        e.printStackTrace()
+        return null
     }
 }
