@@ -54,8 +54,22 @@ fun ByteArray.toHex(): String {
 }
 
 //取得網頁原始碼
-fun String.getWebResource(timeout: Int): String? {
-    return util.getText(this, timeout)
+fun String.getWebResource(timeout: Int, method: String = "GET"): String? {
+    return util.getText(this, timeout, method)
+}
+
+//添加請求內容
+fun String.addParameters(item: Array<String>, result: Array<String>): String {
+    var re = this
+    for (i in item.indices) {
+        re += if (!re.contains("?")) {
+            "?${item[i]}=${result[i]}"
+        } else {
+            "&${item[i]}=${result[i]}"
+        }
+    }
+    Log.e("addParameters", re)
+    return re
 }
 
 //下載檔案並儲存至Sqlite資料庫
@@ -114,8 +128,9 @@ fun String.storeFile(name: String): Boolean {
         return false
     }
 }
+
 //儲存序列化物件
-fun Any.storeObject(name:String):Boolean{
+fun Any.storeObject(name: String): Boolean {
     try {
         val out = ByteArrayOutputStream()
         val oos = ObjectOutputStream(out)
@@ -123,18 +138,19 @@ fun Any.storeObject(name:String):Boolean{
         sqlClass.getControlInstance()
             .item_File.exsql("insert or replace into file (name,data) values ('$name','${out.toByteArray().toHex()}')")
         return true
-    }catch (e:Exception){
+    } catch (e: Exception) {
         e.printStackTrace()
         return false
     }
 }
+
 //取得序列化物件
-fun String.getObject():Any?{
+fun String.getObject(): Any? {
     try {
         val out = ByteArrayInputStream(this.getFile())
         val oos = ObjectInputStream(out)
         return oos.readObject()
-    }catch (e:Exception){
+    } catch (e: Exception) {
         e.printStackTrace()
         return null
     }

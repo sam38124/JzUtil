@@ -3,6 +3,7 @@ package com.orango.electronic.jzutil
 import android.util.Log
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.net.HttpURLConnection
 import java.net.URL
 
 object util{
@@ -29,10 +30,12 @@ object util{
             return null
         }
     }
-    fun getText(url: String, timeout: Int): String? {
+    fun getText(tempurl: String, timeout: Int,method:String): String? {
         try {
-            val conn = URL(url).openConnection()
+            val url=if(method.toUpperCase()=="POST"&&tempurl.contains("?"))  tempurl.substring(tempurl.indexOf("?")+1) else tempurl
+            val conn: HttpURLConnection = URL(url).openConnection() as HttpURLConnection
             conn.connectTimeout = timeout
+            conn.requestMethod = method
             val reader = BufferedReader(InputStreamReader(conn.inputStream, "utf-8"))
             var line: String? = null
             val strBuf = StringBuffer()
