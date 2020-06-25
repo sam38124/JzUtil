@@ -11,8 +11,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Thread{
-            "https://192.168.0.13:8080/Validate?serial=nodata".getWebResource(5000)
-            Log.e("timeout","timeout")
+
+            Log.e("timeout","http://192.168.0.13:8080/lanVersion".getWebResource(5000))
         }.start()
     }
 }

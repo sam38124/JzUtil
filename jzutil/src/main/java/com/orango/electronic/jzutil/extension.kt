@@ -54,10 +54,9 @@ fun ByteArray.toHex(): String {
 }
 
 //取得網頁原始碼
-fun String.getWebResource(timeout: Int, method: String = "GET"): String? {
-    return util.getText(this, timeout, method)
+fun String.getWebResource(timeout: Int, method: String = "GET",postData:String=""): String? {
+    return util.getText(this, timeout, method,postData)
 }
-
 //添加請求內容
 fun String.addParameters(item: Array<String>, result: Array<String>): String {
     var re = this
