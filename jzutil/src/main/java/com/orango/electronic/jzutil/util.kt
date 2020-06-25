@@ -46,7 +46,7 @@ object util {
             conn.doOutput = true;
             if (method.toUpperCase() == "POST" && tempurl.contains("?")) {
                 val wr = DataOutputStream(conn.outputStream)
-                wr.writeBytes(tempurl.substring(tempurl.indexOf("?")))
+                wr.writeBytes(tempurl.substring(tempurl.indexOf("?")+1))
                 wr.flush()
                 wr.close()
             }
