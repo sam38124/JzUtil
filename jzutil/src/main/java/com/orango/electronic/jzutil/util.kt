@@ -2,40 +2,54 @@ package com.orango.electronic.jzutil
 
 import android.util.Log
 import java.io.BufferedReader
+import java.io.DataOutputStream
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 
-object util{
+
+object util {
     fun getHex(url: String, timeout: Int): String? {
         try {
-            var data=""
+            var data = ""
             val conn = URL(url).openConnection()
             conn.connectTimeout = timeout * 1000
             val inp = conn.inputStream
             val bufferSize = 8192
             val buf = ByteArray(bufferSize)
             while (true) {
-                val read =inp.read(buf)
+                val read = inp.read(buf)
                 if (read == -1) {
                     break
                 }
-                val d=buf.copyOfRange(0, read).toHex()
-                data+=d
+                val d = buf.copyOfRange(0, read).toHex()
+                data += d
             }
             return data
         } catch (e: Exception) {
-            Log.e("getHex",e.message)
+            Log.e("getHex", e.message)
             e.printStackTrace()
             return null
         }
     }
-    fun getText(tempurl: String, timeout: Int,method:String): String? {
+
+    fun getText(tempurl: String, timeout: Int, method: String): String? {
         try {
-            val url=if(method.toUpperCase()=="POST"&&tempurl.contains("?"))  tempurl.substring(tempurl.indexOf("?")+1) else tempurl
+            val url =
+                if (method.toUpperCase() == "POST" && tempurl.contains("?")) tempurl.substring(
+                    0,
+                    tempurl.indexOf("?")
+                ) else tempurl
             val conn: HttpURLConnection = URL(url).openConnection() as HttpURLConnection
             conn.connectTimeout = timeout
             conn.requestMethod = method
+            conn.doOutput = true;
+            if (method.toUpperCase() == "POST" && tempurl.contains("?")) {
+                val wr = DataOutputStream(conn.outputStream)
+                wr.writeBytes(tempurl.substring(tempurl.indexOf("?")))
+                wr.flush()
+                wr.close()
+            }
             val reader = BufferedReader(InputStreamReader(conn.inputStream, "utf-8"))
             var line: String? = null
             val strBuf = StringBuffer()
