@@ -190,7 +190,7 @@ fun String.stringToUnicode(): String? {
 //将unicode的汉字码转换成utf-8格式的汉字
 fun String.unicodeToString(): String? {
     val string = StringBuffer()
-    val hex = this.split("\\\\u").toTypedArray()
+    val hex = this.replace("\\\\u","\\u").split("\\u").toTypedArray()
     for (i in 1 until hex.size) { //        System.out.println(hex[i].length());
         if (hex[i].length > 4) {
             string.append(hex[i].substring(4))
