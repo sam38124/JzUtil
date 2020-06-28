@@ -39,11 +39,11 @@ object util {
             val conn: HttpURLConnection = URL(url).openConnection() as HttpURLConnection
             conn.connectTimeout = timeout
             conn.requestMethod = method.toUpperCase()
-            if (method.toUpperCase() == "POST" && (tempurl.contains("?") || data.isNotEmpty())) {
+            if (method.toUpperCase() == "POST" && (tempurl.contains("?") || data.isNotEmpty() || dataArray!=null )) {
                 conn.doOutput = true;
             }
             conn.doInput = true;
-            if (method.toUpperCase() == "POST" && (tempurl.contains("?") || data.isNotEmpty())) {
+            if (method.toUpperCase() == "POST" && (tempurl.contains("?") || data.isNotEmpty()) || dataArray!=null) {
                 if(dataArray !=null){
                     val wr = DataOutputStream(conn.outputStream)
                     wr.write(dataArray)

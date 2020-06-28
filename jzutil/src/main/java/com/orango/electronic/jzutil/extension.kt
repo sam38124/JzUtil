@@ -55,9 +55,18 @@ fun ByteArray.toHex(): String {
     return sb.toString()
 }
 
-//取得網頁原始碼
-fun String.getWebResource(timeout: Int, method: String = "GET", postString: String = "",postData:ByteArray? = null): String? {
-    return util.getText(this, timeout, method, postString,postData)
+//Get 取得網頁原始碼
+fun String.getWebResource(timeout: Int,postString: String = "",postData:ByteArray? = null): String? {
+    return util.getText(this, timeout, "GET", postString,postData)
+}
+
+//POST String
+fun String.postRequest(timeout: Int, postString: String ): String? {
+    return util.getText(this, timeout, "POST", postString,null)
+}
+//POST Data
+fun String.postRequest(timeout: Int, postData:ByteArray? = null): String? {
+    return util.getText(this, timeout, "POST", "",postData)
 }
 
 //添加請求內容
