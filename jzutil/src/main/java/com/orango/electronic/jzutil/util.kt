@@ -31,7 +31,7 @@ object util {
         }
     }
 
-    fun getText(tempurl: String, timeout: Int, method: String,data:String=""): String? {
+    fun getText(tempurl: String, timeout: Int, method: String,data:String="",dataArray: ByteArray?): String? {
         try {
             val url =
                 if (method.toUpperCase() == "POST" && tempurl.contains("?") ) tempurl.substring(0,
@@ -44,10 +44,17 @@ object util {
             }
             conn.doInput = true;
             if (method.toUpperCase() == "POST" && (tempurl.contains("?") || data.isNotEmpty())) {
-                val wr = DataOutputStream(conn.outputStream)
-                wr.writeBytes(if(data.isNotEmpty()) data else tempurl.substring(tempurl.indexOf("?")+1))
-                wr.flush()
-                wr.close()
+                if(dataArray !=null){
+                    val wr = DataOutputStream(conn.outputStream)
+                    wr.write(dataArray)
+                    wr.flush()
+                    wr.close()
+                }else{
+                    val wr = DataOutputStream(conn.outputStream)
+                    wr.writeBytes(if(data.isNotEmpty()) data else tempurl.substring(tempurl.indexOf("?")+1))
+                    wr.flush()
+                    wr.close()
+                }
             }
             val reader = BufferedReader(InputStreamReader(conn.inputStream, "utf-8"))
             var line: String? = null
