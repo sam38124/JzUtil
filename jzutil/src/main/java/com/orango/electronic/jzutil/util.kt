@@ -33,17 +33,15 @@ object util {
 
     fun getText(tempurl: String, timeout: Int, method: String,data:String="",dataArray: ByteArray?): String? {
         try {
-            val url =
-                if (method.toUpperCase() == "POST" && tempurl.contains("?") ) tempurl.substring(0,
-                    tempurl.indexOf("?")) else tempurl
+            val url =tempurl
             val conn: HttpURLConnection = URL(url).openConnection() as HttpURLConnection
             conn.connectTimeout = timeout
             conn.requestMethod = method.toUpperCase()
-            if (method.toUpperCase() == "POST" && (tempurl.contains("?") || data.isNotEmpty() || dataArray!=null )) {
+            if (method.toUpperCase() == "POST" ) {
                 conn.doOutput = true;
             }
             conn.doInput = true;
-            if (method.toUpperCase() == "POST" && (tempurl.contains("?") || data.isNotEmpty()) || dataArray!=null) {
+            if (method.toUpperCase() == "POST") {
                 if(dataArray !=null){
                     val wr = DataOutputStream(conn.outputStream)
                     wr.write(dataArray)
@@ -51,7 +49,7 @@ object util {
                     wr.close()
                 }else{
                     val wr = DataOutputStream(conn.outputStream)
-                    wr.writeBytes(if(data.isNotEmpty()) data else tempurl.substring(tempurl.indexOf("?")+1))
+                    wr.writeBytes(data)
                     wr.flush()
                     wr.close()
                 }
