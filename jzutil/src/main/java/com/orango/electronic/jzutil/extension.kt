@@ -8,10 +8,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import com.jzsql.lib.mmySql.Sql_Result
 import com.orange.jzchi.jzframework.JzActivity
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
+import com.orango.electronic.jzutil.util.getBytes
+import java.io.*
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -190,7 +188,7 @@ fun String.stringToUnicode(): String? {
 //将unicode的汉字码转换成utf-8格式的汉字
 fun String.unicodeToString(): String? {
     val string = StringBuffer()
-    val hex = this.replace("\\\\u","\\u").split("\\u").toTypedArray()
+    val hex = this.replace("\\\\u", "\\u").split("\\u").toTypedArray()
     for (i in 1 until hex.size) { //        System.out.println(hex[i].length());
         if (hex[i].length > 4) {
             string.append(hex[i].substring(4))
@@ -245,4 +243,9 @@ fun String.CalculateTime(): String {
         }
     }
     return msg
+}
+
+//InputStream換array
+fun InputStream.streamToArray(): ByteArray {
+    return getBytes(this)
 }
