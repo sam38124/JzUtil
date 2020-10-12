@@ -3,6 +3,7 @@ package com.orango.electronic.jzutil
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.jzsql.lib.mmySql.Sql_Result
+import java.lang.reflect.Type
 
 
 //儲存序列化物件
@@ -11,7 +12,9 @@ fun  <T> T.storeObject(name: String,rout:String="file"): Boolean {
         sqlClass.getControlInstance().createRout(rout)
         sqlClass.getControlInstance()
             .item_File.exsql(
-                "insert or replace into $rout (name,data) values ('$name','${sqliteEscape(Gson().toJson(this))}')"
+                "insert or replace into $rout (name,data) values ('$name','${sqliteEscape(Gson().toJson(this,
+                    object : TypeToken<T>() {}.type
+                ))}')"
             )
         return true
     } catch (e: Exception) {
