@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import com.orango.electronic.jzutil.getObject
 import com.orango.electronic.jzutil.getWebResource
-import com.orango.electronic.jzutil.storeObject
 
 class MainActivity : AppCompatActivity() {
 
