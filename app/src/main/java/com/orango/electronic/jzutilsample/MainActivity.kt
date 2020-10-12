@@ -12,7 +12,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         Thread{
 
-            Log.e("timeout","http://192.168.0.13:8080/lanVersion".getWebResource(5000))
+            Log.e("timeout","data->"+"https://www.gotit.tw/WS/Mobile/UserValidate".getWebResource(5000))
         }.start()
     }
 }
