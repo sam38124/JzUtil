@@ -147,47 +147,6 @@ fun String.storeFile(name: String): Boolean {
     }
 }
 
-//儲存序列化物件
-fun Any.storeObject(name: String): Boolean {
-    try {
-        sqlClass.getControlInstance()
-            .item_File.exsql(
-                "insert or replace into file (name,data) values ('$name','${sqliteEscape(Gson().toJson(this))}')"
-            )
-        return true
-    } catch (e: Exception) {
-        e.printStackTrace()
-        return false
-    }
-}
-fun sqliteEscape(keyWord: String): String? {
-    var keyWord = keyWord
-    keyWord = keyWord.replace("/", "//")
-    keyWord = keyWord.replace("'", "''")
-    keyWord = keyWord.replace("[", "/[")
-    keyWord = keyWord.replace("]", "/]")
-    keyWord = keyWord.replace("%", "/%")
-    keyWord = keyWord.replace("&", "/&")
-    keyWord = keyWord.replace("_", "/_")
-    keyWord = keyWord.replace("(", "/(")
-    keyWord = keyWord.replace(")", "/)")
-    return keyWord
-}
-//取得序列化物件
-fun <T> String.getObject(): T? {
-    try {
-        var data = ""
-        sqlClass.getControlInstance().item_File.query(
-            "select data from file where name='$this'",
-            Sql_Result {
-                data = it.getString(0)
-            })
-        return Gson().fromJson(data, object : TypeToken<T>() {}.type)
-    } catch (e: Exception) {
-        e.printStackTrace()
-        return null
-    }
-}
 
 //将utf-8的汉字转换成unicode格式汉字码
 fun String.stringToUnicode(): String? {
