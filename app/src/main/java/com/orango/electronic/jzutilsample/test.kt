@@ -1,5 +1,7 @@
 package com.orango.electronic.jzutilsample
 
-fun main(){
+import com.orango.electronic.jzutil.getObject
 
+fun main(){
+"".getObject<MainActivity>()
 }

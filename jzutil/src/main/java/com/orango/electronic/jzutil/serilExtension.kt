@@ -26,7 +26,7 @@ fun <T> T.storeObject(name: String, rout: String = "file"): Boolean {
 }
 
 //取得序列化物件
-fun  <T> String.getObject(rout: String = "file",typeToken:Class<T>) : T? {
+inline fun  <reified T> String.getObject(rout: String = "file") : T? {
     try {
         var data = ""
         sqlClass.getControlInstance().item_File.query(
@@ -34,7 +34,7 @@ fun  <T> String.getObject(rout: String = "file",typeToken:Class<T>) : T? {
             Sql_Result {
                 data = it.getString(0)
             })
-        return Gson().fromJson(data, typeToken)
+        return Gson().fromJson(data,T::class.java)
     } catch (e: Exception) {
         e.printStackTrace()
         return null
