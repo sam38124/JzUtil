@@ -6,10 +6,12 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.jzsql.lib.mmySql.Sql_Result
 import com.orange.jzchi.jzframework.JzActivity
 import com.orango.electronic.jzutil.util.getBytes
-import java.io.*
+import java.io.InputStream
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -56,17 +58,22 @@ fun ByteArray.toHex(): String {
 }
 
 //Get 取得網頁原始碼
-fun String.getWebResource(timeout: Int,postString: String = "",postData:ByteArray? = null): String? {
-    return util.getText(this, timeout, "GET", postString,postData)
+fun String.getWebResource(
+    timeout: Int,
+    postString: String = "",
+    postData: ByteArray? = null
+): String? {
+    return util.getText(this, timeout, "GET", postString, postData)
 }
 
 //POST String
-fun String.postRequest(timeout: Int, postString: String ): String? {
-    return util.getText(this, timeout, "POST", postString,null)
+fun String.postRequest(timeout: Int, postString: String): String? {
+    return util.getText(this, timeout, "POST", postString, null)
 }
+
 //POST Data
-fun String.postRequest(timeout: Int, postData:ByteArray? = null): String? {
-    return util.getText(this, timeout, "POST", "",postData)
+fun String.postRequest(timeout: Int, postData: ByteArray? = null): String? {
+    return util.getText(this, timeout, "POST", "", postData)
 }
 
 //添加請求內容
@@ -103,10 +110,17 @@ fun String.storeFile(name: String, timeout: Int): Boolean {
 
 //取得檔案
 fun String.getFile(): ByteArray? {
-    var data: ByteArray? = null
-    val file=File("jz$this")
-    data=file.readBytes()
-    return data
+    var data: String? = null
+    sqlClass.getControlInstance().item_File.query(
+        "select data from file where name='$this'",
+        Sql_Result {
+            data = it.getString(0)
+        })
+    if (data != null) {
+        return data!!.hexToByte()
+    } else {
+        return null
+    }
 }
 
 //將Byte帶入ImageView
@@ -136,23 +150,39 @@ fun String.storeFile(name: String): Boolean {
 //儲存序列化物件
 fun Any.storeObject(name: String): Boolean {
     try {
-        val out = ByteArrayOutputStream()
-        val oos = ObjectOutputStream(out)
-        oos.writeObject(this);
-        File("jz$name").writeBytes(out.toByteArray())
+        sqlClass.getControlInstance()
+            .item_File.exsql(
+                "insert or replace into file (name,data) values ('$name','${sqliteEscape(Gson().toJson(this))}')"
+            )
         return true
     } catch (e: Exception) {
         e.printStackTrace()
         return false
     }
 }
-
+fun sqliteEscape(keyWord: String): String? {
+    var keyWord = keyWord
+    keyWord = keyWord.replace("/", "//")
+    keyWord = keyWord.replace("'", "''")
+    keyWord = keyWord.replace("[", "/[")
+    keyWord = keyWord.replace("]", "/]")
+    keyWord = keyWord.replace("%", "/%")
+    keyWord = keyWord.replace("&", "/&")
+    keyWord = keyWord.replace("_", "/_")
+    keyWord = keyWord.replace("(", "/(")
+    keyWord = keyWord.replace(")", "/)")
+    return keyWord
+}
 //取得序列化物件
-fun String.getObject(): Any? {
+fun <T> String.getObject(): T? {
     try {
-        val out = ByteArrayInputStream(this.getFile())
-        val oos = ObjectInputStream(out)
-        return oos.readObject()
+        var data = ""
+        sqlClass.getControlInstance().item_File.query(
+            "select data from file where name='$this'",
+            Sql_Result {
+                data = it.getString(0)
+            })
+        return Gson().fromJson(data, object : TypeToken<T>() {}.type)
     } catch (e: Exception) {
         e.printStackTrace()
         return null
