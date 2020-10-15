@@ -53,13 +53,13 @@ inline fun <reified T> String.delete(rout: String = "file"): Boolean? {
 }
 
 //列出此路徑序列化物件
- fun String.listObject(rout: String = "file"): ArrayList<JsonObject> {
+ fun String.listObject(): ArrayList<JsonObject> {
     try {
         val data :ArrayList<JsonObject> = ArrayList<JsonObject>()
         sqlClass.getControlInstance().item_File.query(
-            "select data from $rout ",
+            "select * from $this ",
             Sql_Result {
-                data.add(JsonObject(String(Base64.decode(it.getString(0),0))))
+                data.add(JsonObject(it.getString(0),String(Base64.decode(it.getString(1),0))))
             })
         return data
     } catch (e: Exception) {
@@ -80,7 +80,7 @@ fun String.clearObject(rout: String = "file"): Boolean {
     }
 }
 
-class JsonObject(var json:String){
+class JsonObject(var name:String,var json:String){
     inline fun <reified T> getObject(): T? {
         try {
             return Gson().fromJson(json, T::class.java)
