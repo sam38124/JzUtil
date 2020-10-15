@@ -36,6 +36,7 @@ object util {
             val url =tempurl
             val conn: HttpURLConnection = URL(url).openConnection() as HttpURLConnection
             conn.connectTimeout = timeout
+            conn.readTimeout = timeout
             conn.requestMethod = method.toUpperCase()
             if (method.toUpperCase() == "POST" ) {
                 conn.doOutput = true;
