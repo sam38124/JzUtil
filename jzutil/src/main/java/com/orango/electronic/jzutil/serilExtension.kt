@@ -42,7 +42,7 @@ inline fun <reified T> String.getObject(rout: String = "file"): T? {
     }
 }
 //刪除序列化物件
-inline fun <reified T> String.delete(rout: String = "file"): Boolean? {
+ fun String.delete(rout: String = "file"): Boolean? {
     try {
         sqlClass.getControlInstance().item_File.exsql("delete from $rout where name='$this'")
         return true
