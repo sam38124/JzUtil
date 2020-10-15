@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken
 import com.jzsql.lib.mmySql.Sql_Result
 import java.text.DateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 //儲存序列化物件
@@ -25,7 +26,6 @@ fun <T> T.storeObject(name: String, rout: String = "file"): Boolean {
         return false
     }
 }
-
 //取得序列化物件
 inline fun <reified T> String.getObject(rout: String = "file"): T? {
     try {
@@ -41,8 +41,35 @@ inline fun <reified T> String.getObject(rout: String = "file"): T? {
         return null
     }
 }
+//刪除序列化物件
+inline fun <reified T> String.delete(rout: String = "file"): Boolean? {
+    try {
+        sqlClass.getControlInstance().item_File.exsql("delete from $rout where name='$this'")
+        return true
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return null
+    }
+}
 
-//清空序列化物件
+//列出此路徑序列化物件
+ fun String.listObject(rout: String = "file"): ArrayList<JsonObject> {
+    try {
+        val data :ArrayList<JsonObject> = ArrayList<JsonObject>()
+        sqlClass.getControlInstance().item_File.query(
+            "select data from $rout ",
+            Sql_Result {
+                data.add(JsonObject(String(Base64.decode(it.getString(0),0))))
+            })
+        return data
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return ArrayList<JsonObject>()
+    }
+
+}
+
+//清空此路徑序列化物件
 fun String.clearObject(rout: String = "file"): Boolean {
     try {
         sqlClass.getControlInstance().item_File.exsql("DROP TABLE $this;\n")
@@ -53,17 +80,13 @@ fun String.clearObject(rout: String = "file"): Boolean {
     }
 }
 
-//過濾特殊字元
-fun sqliteEscape(keyWord: String): String? {
-    var keyWord = keyWord
-    keyWord = keyWord.replace("/", "//")
-    keyWord = keyWord.replace("'", "''")
-    keyWord = keyWord.replace("[", "/[")
-    keyWord = keyWord.replace("]", "/]")
-    keyWord = keyWord.replace("%", "/%")
-    keyWord = keyWord.replace("&", "/&")
-    keyWord = keyWord.replace("_", "/_")
-    keyWord = keyWord.replace("(", "/(")
-    keyWord = keyWord.replace(")", "/)")
-    return keyWord
+class JsonObject(var json:String){
+    inline fun <reified T> getObject(): T? {
+        try {
+            return Gson().fromJson(json, T::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+    }
 }
