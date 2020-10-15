@@ -1,22 +1,23 @@
 package com.orango.electronic.jzutil
 
+import android.util.Base64
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.jzsql.lib.mmySql.Sql_Result
+import java.text.DateFormat
+import java.util.*
 
 
 //儲存序列化物件
 fun <T> T.storeObject(name: String, rout: String = "file"): Boolean {
     try {
         sqlClass.getControlInstance().createRout(rout)
+
         sqlClass.getControlInstance()
             .item_File.exsql(
-                "insert or replace into $rout (name,data) values ('$name','${sqliteEscape(
-                    Gson().toJson(
-                        this,
-                        object : TypeToken<T>() {}.type
-                    )
-                )}')"
+                "insert or replace into $rout (name,data) values ('$name','${  Base64.encodeToString(  Gson().toJson(this,
+                    object : TypeToken<T>() {}.type
+                ).toByteArray(), DateFormat.DEFAULT)}')"
             )
         return true
     } catch (e: Exception) {
@@ -32,7 +33,7 @@ inline fun <reified T> String.getObject(rout: String = "file"): T? {
         sqlClass.getControlInstance().item_File.query(
             "select data from $rout where name='$this'",
             Sql_Result {
-                data = it.getString(0)
+                data = String(Base64.decode(it.getString(0),0))
             })
         return Gson().fromJson(data, T::class.java)
     } catch (e: Exception) {
