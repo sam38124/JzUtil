@@ -53,11 +53,11 @@ inline fun <reified T> String.getObject(rout: String = "file"): T? {
 }
 
 //列出此路徑序列化物件
- fun String.listObject(): ArrayList<JsonObject> {
+ fun String.listObject(limit:Int=0): ArrayList<JsonObject> {
     try {
         val data :ArrayList<JsonObject> = ArrayList<JsonObject>()
         sqlClass.getControlInstance().item_File.query(
-            "select * from $this ",
+            "select * from $this ${if(limit==0) "" else "limit 0,$limit"}",
             Sql_Result {
                 data.add(JsonObject(it.getString(0),String(Base64.decode(it.getString(1),0))))
             })
