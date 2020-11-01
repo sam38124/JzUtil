@@ -6,15 +6,6 @@ class SqlClass {
 
     lateinit var item_File: JzSqlHelper
 
-    init {
-        item_File.exsql(
-            "CREATE TABLE IF NOT EXISTS `file` (\n" +
-                    "    name VARCHAR PRIMARY KEY,\n" +
-                    "    data      VARCHAR\n" +
-                    ");\n"
-        )
-    }
-
     fun createRout(rout:String){
         item_File.exsql("CREATE TABLE IF NOT EXISTS `$rout` (\n" +
                 "    name VARCHAR PRIMARY KEY,\n" +

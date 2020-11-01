@@ -11,6 +11,12 @@ import java.net.URL
 object JzUtil {
     fun setUp(context: Context) {
         SqlClass.getControlInstance().item_File = JzSqlHelper(context, "JzutilFiles.db")
+        SqlClass.getControlInstance().item_File.exsql(
+            "CREATE TABLE IF NOT EXISTS `file` (\n" +
+                    "    name VARCHAR PRIMARY KEY,\n" +
+                    "    data      VARCHAR\n" +
+                    ");\n"
+        )
     }
 
     fun getHex(url: String, timeout: Int): String? {
