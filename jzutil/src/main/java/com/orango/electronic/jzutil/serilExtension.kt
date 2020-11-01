@@ -9,13 +9,6 @@ import java.text.DateFormat
 import kotlin.collections.ArrayList
 
 
-//初次載入必須存入context
-object SerialExtension{
-    fun initial( context: Context){
-        SqlClass.context=context
-        SqlClass.getControlInstance()
-    }
-}
 
 //儲存序列化物件
 fun <T> T.storeObject(name: String, rout: String = "file"): Boolean {

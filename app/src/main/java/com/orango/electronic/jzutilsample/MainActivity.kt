@@ -11,7 +11,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        SerialExtension.initial(applicationContext)
         Thread {
             for (i in 0 until 1000) {
                 SqlClass.getControlInstance().item_File.exsql("insert or replace into file (name,data) values ('$i','dskdsods')")
