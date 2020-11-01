@@ -6,10 +6,9 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import com.google.gson.reflect.TypeToken
 import com.jzsql.lib.mmySql.Sql_Result
 import com.orange.jzchi.jzframework.JzActivity
-import com.orango.electronic.jzutil.util.getBytes
+import com.orango.electronic.jzutil.JzUtil.getBytes
 import java.io.InputStream
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -61,7 +60,7 @@ fun String.getWebResource(
     timeout: Int,
     downloadProgress: (a: Int) -> Unit = {}
 ): String? {
-    return util.getRequest(this, timeout, downloadProgress)
+    return JzUtil.getRequest(this, timeout, downloadProgress)
 }
 
 //POST String
@@ -71,7 +70,7 @@ fun String.postRequest(
     uploadProgress: (a: Int) -> Unit = {},
     downloadProgress: (a: Int) -> Unit = {}
 ): String? {
-    return util.postRequest(
+    return JzUtil.postRequest(
         this,
         timeout,
         postString.toByteArray(),
@@ -87,7 +86,7 @@ fun String.postRequest(
     uploadProgress: (a: Int) -> Unit = {},
     downloadProgress: (a: Int) -> Unit = {}
 ): String? {
-    return util.postRequest(this, timeout, postData, uploadProgress, downloadProgress)
+    return JzUtil.postRequest(this, timeout, postData, uploadProgress, downloadProgress)
 }
 
 //添加請求內容
@@ -106,11 +105,11 @@ fun String.addParameters(item: Array<String>, result: Array<String>): String {
 
 //下載檔案並儲存至Sqlite資料庫
 fun String.storeFile(name: String, timeout: Int): Boolean {
-    val data = util.getHex(this, timeout)
+    val data = JzUtil.getHex(this, timeout)
     if (data != null) {
         try {
             Log.e("dataHex", data)
-            sqlClass.getControlInstance()
+            SqlClass.getControlInstance()
                 .item_File.exsql("insert or replace into file (name,data) values ('$name','$data')")
             return true
         } catch (e: Exception) {
@@ -125,7 +124,7 @@ fun String.storeFile(name: String, timeout: Int): Boolean {
 //取得檔案
 fun String.getFile(): ByteArray? {
     var data: String? = null
-    sqlClass.getControlInstance().item_File.query(
+    SqlClass.getControlInstance().item_File.query(
         "select data from file where name='$this'",
         Sql_Result {
             data = it.getString(0)
@@ -152,7 +151,7 @@ fun ImageView.setImage(data: ByteArray) {
 fun String.storeFile(name: String): Boolean {
     try {
         Log.e("dataHex", this)
-        sqlClass.getControlInstance()
+        SqlClass.getControlInstance()
             .item_File.exsql("insert or replace into file (name,data) values ('$name','$this')")
         return true
     } catch (e: Exception) {

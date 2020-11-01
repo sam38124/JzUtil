@@ -1,14 +1,18 @@
 package com.orango.electronic.jzutil
 
-import android.os.Handler
-import android.os.Looper
+import android.content.Context
 import android.util.Log
+import com.jzsql.lib.mmySql.JzSqlHelper
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
 
 
-object util {
+object JzUtil {
+    fun setUp(context: Context) {
+        SqlClass.getControlInstance().item_File = JzSqlHelper(context, "JzutilFiles.db")
+    }
+
     fun getHex(url: String, timeout: Int): String? {
         try {
             var data = ""
@@ -27,22 +31,26 @@ object util {
             }
             return data
         } catch (e: Exception) {
-            Log.e("getHex", e.message)
             e.printStackTrace()
             return null
         }
     }
+
     fun postRequest(
-        url: String, timeout: Int,
-        dataArray: ByteArray,uploadProgress:(a:Int)->Unit = {},downloadProgress:(a:Int)->Unit = {}): String? {
+        url: String,
+        timeout: Int,
+        dataArray: ByteArray,
+        uploadProgress: (a: Int) -> Unit = {},
+        downloadProgress: (a: Int) -> Unit = {}
+    ): String? {
         try {
             val conn: HttpURLConnection = URL(url).openConnection() as HttpURLConnection
             conn.connectTimeout = timeout
             conn.readTimeout = timeout
             conn.requestMethod = "POST"
-            conn.doOutput=true
+            conn.doOutput = true
             conn.doInput = true;
-            val inputStream=dataArray.inputStream()
+            val inputStream = dataArray.inputStream()
             val wr = DataOutputStream(conn.outputStream)
             val buffer = ByteArray(1024)
             val length = inputStream.available()
@@ -58,14 +66,16 @@ object util {
             }
             wr.close()
             val reader = DataInputStream(conn.inputStream)
-            var strBuf=""
+            var strBuf = ""
             var downLoad = 0L
             reader.use {
                 var read: Int
                 while (reader.read(buffer).also { read = it } != -1) {
                     downLoad += read
                     strBuf += String(buffer.copyOfRange(0, read))
-                    if(reader.available()>0){ downloadProgress((downLoad * 100 / reader.available()).toInt())}
+                    if (reader.available() > 0) {
+                        downloadProgress((downLoad * 100 / reader.available()).toInt())
+                    }
 
                 }
             }
@@ -76,8 +86,10 @@ object util {
             return null
         }
     }
+
     fun getRequest(
-        url: String, timeout: Int,downloadProgress:(a:Int)->Unit = {}): String? {
+        url: String, timeout: Int, downloadProgress: (a: Int) -> Unit = {}
+    ): String? {
         try {
             val conn: HttpURLConnection = URL(url).openConnection() as HttpURLConnection
             conn.connectTimeout = timeout
@@ -86,14 +98,16 @@ object util {
             conn.doInput = true;
             val buffer = ByteArray(1024)
             val reader = DataInputStream(conn.inputStream)
-            var strBuf=""
+            var strBuf = ""
             var downLoad = 0L
             reader.use {
                 var read: Int
                 while (reader.read(buffer).also { read = it } != -1) {
                     downLoad += read
                     strBuf += String(buffer.copyOfRange(0, read))
-                    if(reader.available()>0){ downloadProgress((downLoad * 100 / reader.available()).toInt())}
+                    if (reader.available() > 0) {
+                        downloadProgress((downLoad * 100 / reader.available()).toInt())
+                    }
                 }
             }
             reader.close()
@@ -103,7 +117,8 @@ object util {
             return null
         }
     }
-    fun getBytes(inputStream: InputStream): ByteArray{
+
+    fun getBytes(inputStream: InputStream): ByteArray {
         val byteBuffer = ByteArrayOutputStream()
         val bufferSize = 1024
         val buffer = ByteArray(bufferSize)
