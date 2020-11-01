@@ -33,5 +33,6 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation project(':jzutil')
-
+    implementation 'com.github.sam38124:JzSqlHelper:6.8'
+    implementation 'com.google.code.gson:gson:2.8.6'
 }

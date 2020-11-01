@@ -1,10 +1,12 @@
 package com.orango.electronic.jzutil
 
+import android.content.Context
 import com.jzsql.lib.mmySql.JzSqlHelper
 import com.orange.jzchi.jzframework.JzActivity
 
 class sqlClass {
-    var item_File: JzSqlHelper = JzSqlHelper(JzActivity.getControlInstance().getRootActivity(), "JzutilFiles.db")
+
+    var item_File: JzSqlHelper = JzSqlHelper(context!!, "JzutilFiles.db")
 
     init {
         item_File.exsql(
@@ -23,6 +25,7 @@ class sqlClass {
     }
 
     companion object {
+        var context:Context? =null
         var instanc: sqlClass? = null
         fun getControlInstance(): sqlClass {
             if (instanc == null) {
@@ -30,5 +33,6 @@ class sqlClass {
             }
             return instanc!!
         }
+
     }
 }

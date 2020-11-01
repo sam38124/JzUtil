@@ -1,5 +1,7 @@
 package com.orango.electronic.jzutil
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import java.io.*
 import java.net.HttpURLConnection
@@ -30,39 +32,71 @@ object util {
             return null
         }
     }
-
-    fun getText(tempurl: String, timeout: Int, method: String,data:String="",dataArray: ByteArray?): String? {
+    fun postRequest(
+        url: String, timeout: Int,
+        dataArray: ByteArray,uploadProgress:(a:Int)->Unit = {},downloadProgress:(a:Int)->Unit = {}): String? {
         try {
-            val url =tempurl
             val conn: HttpURLConnection = URL(url).openConnection() as HttpURLConnection
             conn.connectTimeout = timeout
             conn.readTimeout = timeout
-            conn.requestMethod = method.toUpperCase()
-            if (method.toUpperCase() == "POST" ) {
-                conn.doOutput = true;
-            }
+            conn.requestMethod = "POST"
+            conn.doOutput=true
             conn.doInput = true;
-            if (method.toUpperCase() == "POST") {
-                if(dataArray !=null){
-                    val wr = DataOutputStream(conn.outputStream)
-                    wr.write(dataArray)
+            val inputStream=dataArray.inputStream()
+            val wr = DataOutputStream(conn.outputStream)
+            val buffer = ByteArray(1024)
+            val length = inputStream.available()
+            var uploaded = 0L
+            inputStream.use {
+                var read: Int
+                while (inputStream.read(buffer).also { read = it } != -1) {
+                    uploaded += read
+                    wr.write(buffer, 0, read)
+                    uploadProgress((uploaded * 100 / length).toInt())
                     wr.flush()
-                    wr.close()
-                }else{
-                    val wr = DataOutputStream(conn.outputStream)
-                    wr.writeBytes(data)
-                    wr.flush()
-                    wr.close()
                 }
             }
-            val reader = BufferedReader(InputStreamReader(conn.inputStream, "utf-8"))
-            var line: String? = null
-            val strBuf = StringBuffer()
-            line = reader.readLine()
-            while (line != null) {
-                strBuf.append(line)
-                line = reader.readLine()
+            wr.close()
+            val reader = DataInputStream(conn.inputStream)
+            var strBuf=""
+            var downLoad = 0L
+            reader.use {
+                var read: Int
+                while (reader.read(buffer).also { read = it } != -1) {
+                    downLoad += read
+                    strBuf += String(buffer.copyOfRange(0, read))
+                    if(reader.available()>0){ downloadProgress((downLoad * 100 / reader.available()).toInt())}
+
+                }
             }
+            reader.close()
+            return strBuf.toString()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+    }
+    fun getRequest(
+        url: String, timeout: Int,downloadProgress:(a:Int)->Unit = {}): String? {
+        try {
+            val conn: HttpURLConnection = URL(url).openConnection() as HttpURLConnection
+            conn.connectTimeout = timeout
+            conn.readTimeout = timeout
+            conn.requestMethod = "GET"
+            conn.doInput = true;
+            val buffer = ByteArray(1024)
+            val reader = DataInputStream(conn.inputStream)
+            var strBuf=""
+            var downLoad = 0L
+            reader.use {
+                var read: Int
+                while (reader.read(buffer).also { read = it } != -1) {
+                    downLoad += read
+                    strBuf += String(buffer.copyOfRange(0, read))
+                    if(reader.available()>0){ downloadProgress((downLoad * 100 / reader.available()).toInt())}
+                }
+            }
+            reader.close()
             return strBuf.toString()
         } catch (e: Exception) {
             e.printStackTrace()

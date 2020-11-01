@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.jzsql.lib.mmySql.Sql_Result
 import com.orange.jzchi.jzframework.JzActivity
@@ -60,20 +59,35 @@ fun ByteArray.toHex(): String {
 //Get 取得網頁原始碼
 fun String.getWebResource(
     timeout: Int,
-    postString: String = "",
-    postData: ByteArray? = null
+    downloadProgress: (a: Int) -> Unit = {}
 ): String? {
-    return util.getText(this, timeout, "GET", postString, postData)
+    return util.getRequest(this, timeout, downloadProgress)
 }
 
 //POST String
-fun String.postRequest(timeout: Int, postString: String): String? {
-    return util.getText(this, timeout, "POST", postString, null)
+fun String.postRequest(
+    timeout: Int,
+    postString: String,
+    uploadProgress: (a: Int) -> Unit = {},
+    downloadProgress: (a: Int) -> Unit = {}
+): String? {
+    return util.postRequest(
+        this,
+        timeout,
+        postString.toByteArray(),
+        uploadProgress,
+        downloadProgress
+    )
 }
 
 //POST Data
-fun String.postRequest(timeout: Int, postData: ByteArray? = null): String? {
-    return util.getText(this, timeout, "POST", "", postData)
+fun String.postRequest(
+    timeout: Int,
+    postData: ByteArray,
+    uploadProgress: (a: Int) -> Unit = {},
+    downloadProgress: (a: Int) -> Unit = {}
+): String? {
+    return util.postRequest(this, timeout, postData, uploadProgress, downloadProgress)
 }
 
 //添加請求內容
